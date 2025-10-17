@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Post Details — Syndicate</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <style>
+    * { transition: all 0.3s ease-in-out; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(to bottom right, #0f172a, #1e293b);
+      color: #fff;
+      overflow-x: hidden;
+      margin: 0;
+    }
+    @keyframes gloss {
+      0%, 100% { opacity: 0; transform: translateX(-100%); }
+      50% { opacity: 1; transform: translateX(100%); }
+    }
+    nav a {
+      position: relative;
+      transition: color 0.3s ease;
+    }
+    nav a::after {
+      content: "";
+      position: absolute;
+      bottom: -4px;
+      left: 50%;
+      transform: translateX(-50%) scaleX(0);
+      width: 60%;
+      height: 2px;
+      background: linear-gradient(to right, #60a5fa, #3b82f6);
+      border-radius: 9999px;
+      opacity: 0.8;
+      transition: transform 0.3s ease-in-out;
+    }
+    nav a:hover::after { transform: translateX(-50%) scaleX(1); }
+    .active-link { color: #60a5fa; font-weight: 600; }
+    .active-link::after { transform: translateX(-50%) scaleX(1); opacity: 0.9; }
+    .glass { background: rgba(255, 255, 255, 0.07); backdrop-filter: blur(14px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; }
+    .card-glow { box-shadow: 0 8px 24px rgba(59, 130, 246, 0.12); }
+    /* Responsive Styles */
+    @media (max-width: 1024px) {
+      .glass { padding: 1.25rem; }
+      .card-glow { box-shadow: none; }
+      header { width: 100%; }
+    }
+    @media (max-width: 768px) {
+      h2 { font-size: 2rem; line-height: 2.5rem; }
+      h3 { font-size: 1.5rem; }
+      p { font-size: 0.9rem; }
+      .glass { padding: 1rem; border-radius: 12px; }
+      .navbar-brand h1 { font-size: 1rem; }
+      .navbar-brand p { font-size: 0.6rem; }
+    }
+    @media (max-width: 480px) {
+      h2 { font-size: 1.5rem; line-height: 2rem; }
+      h3 { font-size: 1.25rem; }
+      p { font-size: 0.85rem; }
+      .glass { padding: 0.75rem; border-radius: 10px; }
+      footer { font-size: 0.65rem; padding: 1rem; }
+      .back-btn { font-size: 0.85rem; padding: 0.5rem 1rem; }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+  <!-- Navbar -->
+  <header id="navbar" class="fixed top-0 left-0 z-50 w-full bg-white/20 dark:bg-slate-900/40 backdrop-blur-2xl border-b border-white/10 transition-all duration-500">
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+      <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent opacity-0 animate-[gloss_6s_linear_infinite]"></div>
+    </div>
+    <div class="flex items-center justify-between h-16 px-4 sm:px-6 max-w-7xl mx-auto">
+      <a href="index.html" class="navbar-brand flex items-center gap-2 sm:gap-3">
+        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-md bg-gradient-to-br from-blue-700 to-yellow-400 flex items-center justify-center text-white font-bold text-base sm:text-lg">S</div>
+        <div class="flex flex-col leading-tight">
+          <h1 class="text-base sm:text-lg font-bold text-white">Syndicate</h1>
+          <p class="text-xs text-gray-300 -mt-1">Battling Corruption</p>
+        </div>
+      </a>
+      <button id="menu-btn" class="md:hidden w-7 h-7 relative flex flex-col justify-center items-center focus:outline-none">
+        <span class="bar absolute w-6 h-[2px] bg-white rounded transition-all duration-300 origin-center"></span>
+        <span class="bar absolute w-6 h-[2px] bg-white rounded transition-all duration-300 origin-center mt-2"></span>
+      </button>
+      <nav class="hidden md:flex gap-4 lg:gap-6 text-slate-200 text-sm lg:text-base">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="data.html">Data</a>
+        <a href="charts.html">Charts</a>
+        <a href="reports.html">Reports</a>
+        <a href="team.html">Team</a>
+        <a href="contact.html">Contact</a>
+        <a href="community.html" class="active-link">Community</a>
+      </nav>
+    </div>
+    <div id="mobile-menu" class="hidden md:hidden flex-col justify-center items-center text-center bg-slate-900/90 backdrop-blur-2xl text-white py-6 space-y-4 border border-slate-700 transform scale-y-0 origin-top opacity-0 translate-y-5 transition-all duration-500 rounded-b-2xl shadow-2xl w-full sm:w-[90%] mx-auto mt-2">
+      <a href="index.html" class="block hover:text-yellow-400 text-sm">Home</a>
+      <a href="about.html" class="block hover:text-yellow-400 text-sm">About</a>
+      <a href="data.html" class="block hover:text-yellow-400 text-sm">Data</a>
+      <a href="charts.html" class="block hover:text-yellow-400 text-sm">Charts</a>
+      <a href="reports.html" class="block hover:text-yellow-400 text-sm">Reports</a>
+      <a href="team.html" class="block hover:text-yellow-400 text-sm">Team</a>
+      <a href="contact.html" class="block hover:text-yellow-400 text-sm">Contact</a>
+      <a href="community.html" class="block text-yellow-400 font-semibold text-sm pb-3">Community</a>
+    </div>
+  </header>
+  <!-- Main Content -->
+  <main class="flex-grow py-20 sm:py-24 px-4 sm:px-6">
+    <div class="max-w-4xl mx-auto">
+      <a href="community.html" class="back-btn inline-block mb-6 px-4 sm:px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow">← Back to Community</a>
+      <section id="postSection" class="glass p-4 sm:p-6 md:p-8 card-glow" data-aos="fade-up">
+        <p id="postAuthor" class="text-sm sm:text-base text-slate-400 mb-2 font-semibold">👤 Loading...</p>
+        <h2 id="postTitle" class="text-xl sm:text-2xl md:text-3xl font-bold text-blue-400 mb-2">Loading...</h2>
+        <p id="postDate" class="text-xs sm:text-sm text-slate-500 mb-4"> Loading...</p>
+        <p id="postDetails" class="text-sm sm:text-base text-slate-300 leading-relaxed">Loading...</p>
+      </section>
+    </div>
+  </main>
+  <footer class="bg-slate-100 dark:bg-slate-800 border-t border-slate-700 py-4 sm:py-5 text-center text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+    © 2025 Syndicate — Built by Seiya Von | Hackathon 2025
+  </footer>
+  <!-- Script -->
+  <script>
+    AOS.init({ duration: 900, once: true });
+    // Navbar logic
+    const menuBtn = document.getElementById('menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const bars = menuBtn.querySelectorAll('.bar');
+    const navbar = document.getElementById('navbar');
+    menuBtn.addEventListener('click', () => {
+      const isOpen = mobileMenu.classList.contains('scale-y-100');
+      if (!isOpen) {
+        mobileMenu.classList.remove('hidden');
+        setTimeout(() => {
+          mobileMenu.classList.add('flex', 'scale-y-100', 'opacity-100', 'translate-y-0');
+          mobileMenu.classList.remove('scale-y-0', 'opacity-0', 'translate-y-5');
+        }, 10);
+        bars[0].classList.add('rotate-45', 'translate-y-[4px]');
+        bars[1].classList.add('-rotate-45', '-translate-y-[4px]');
+      } else {
+        mobileMenu.classList.remove('scale-y-100', 'opacity-100', 'translate-y-0');
+        mobileMenu.classList.add('scale-y-0', 'opacity-0', 'translate-y-5');
+        setTimeout(() => {
+          mobileMenu.classList.remove('flex');
+          mobileMenu.classList.add('hidden');
+        }, 400);
+        bars[0].classList.remove('rotate-45', 'translate-y-[4px]');
+        bars[1].classList.remove('-rotate-45', '-translate-y-[4px]');
+      }
+    });
+    document.querySelectorAll('#mobile-menu a').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.remove('scale-y-100', 'opacity-100', 'translate-y-0');
+        mobileMenu.classList.add('scale-y-0', 'opacity-0', 'translate-y-5');
+        setTimeout(() => {
+          mobileMenu.classList.remove('flex');
+          mobileMenu.classList.add('hidden');
+        }, 400);
+        bars[0].classList.remove('rotate-45', 'translate-y-[4px]');
+        bars[1].classList.remove('-rotate-45', '-translate-y-[4px]');
+      });
+    });
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 10) {
+        navbar.classList.add('top-2', 'w-[98%]', 'rounded-3xl', 'shadow-lg', 'bg-white/30', 'dark:bg-slate-900/50', 'border');
+      } else {
+        navbar.classList.remove('top-2', 'w-[98%]', 'rounded-3xl', 'shadow-lg', 'bg-white/30', 'dark:bg-slate-900/50', 'border');
+        navbar.classList.add('w-full', 'border-b');
+      }
+    });
+    // Post details logic
+    const params = new URLSearchParams(window.location.search);
+    const postId = params.get('id');
+    const posts = JSON.parse(localStorage.getItem("communityPosts")) || [];
+    if (postId === null || isNaN(postId) || postId < 0 || postId >= posts.length) {
+      document.getElementById('postSection').innerHTML = '<p class="text-red-500">Post not found. Please return to the Community page.</p>';
+    } else {
+      const post = posts[postId];
+      document.getElementById('postAuthor').textContent = `👤 ${post.anonymousName}`;
+      document.getElementById('postTitle').textContent = post.title;
+      document.getElementById('postDate').textContent = `${post.date}`;
+      document.getElementById('postDetails').textContent = post.details;
+    }
+  </script>
+</body>
+</html>
