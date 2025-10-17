@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Community — Syndicate</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- AOS Animation -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      AOS.init({ duration: 900, once: true, offset: 120 });
+    });
+  </script>
+
+  <style>
+  /* Global smooth transitions */
+  * {
+    transition: all 0.3s ease-in-out;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* ✨ Gloss animation (for header shine) */
+  @keyframes gloss {
+    0%, 100% {
+      opacity: 0;
+      transform: translateX(-100%);
+    }
+    50% {
+      opacity: 1;
+      transform: translateX(100%);
+    }
+  }
+
+  /* --- 🔵 Desktop Nav Links --- */
+  nav a {
+    position: relative;
+    transition: color 0.3s ease;
+  }
+
+  /* Hover underline for all links */
+  nav a::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%) scaleX(0);
+    transform-origin: center;
+    width: 60%;
+    height: 2px;
+    background: linear-gradient(to right, #60a5fa, #3b82f6); /* blue gradient */
+    border-radius: 9999px;
+    opacity: 0.8;
+    transition: transform 0.3s ease-in-out;
+  }
+
+  /* Animate underline on hover */
+  nav a:hover::after {
+    transform: translateX(-50%) scaleX(1);
+  }
+
+  /* --- 🔷 Active Page Link (Manual) --- */
+  .active-link {
+    position: relative;
+    color: #60a5fa; /* Tailwind blue-400 */
+    font-weight: 600;
+  }
+
+  /* Keep underline visible for active link */
+  .active-link::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%) scaleX(1);
+    transform-origin: center;
+    width: 60%;
+    height: 2px;
+    background: linear-gradient(to right, #60a5fa, #3b82f6);
+    border-radius: 9999px;
+    opacity: 0.9;
+  }
+</style>
+
+</head>
+
+<body class="min-h-screen flex flex-col bg-slate-900 text-white">
+  <!-- Navbar -->
+<header id="navbar" class="fixed top-0 left-1/2 -translate-x-1/2 z-50 w-full md:w-[95%] bg-white/20 dark:bg-slate-900/40 backdrop-blur-2xl border-b border-white/10 dark:border-slate-700 transition-all duration-500 overflow-hidden"
+>
+  <!-- Gloss effect (clipped inside header) -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div
+      class="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent opacity-0 animate-[gloss_6s_linear_infinite]"
+    ></div>
+  </div>
+
+  <div class="flex items-center justify-between h-16 px-6 relative">
+    <!-- Logo -->
+    <a href="index.html" class="flex items-center gap-3">
+      <div
+        class="w-9 h-9 rounded-md bg-gradient-to-br from-blue-700 to-yellow-400 flex items-center justify-center text-white font-bold text-lg"
+      >
+        S
+      </div>
+      <div class="flex flex-col leading-tight">
+        <h1 class="text-lg font-bold text-white">Syndicate</h1>
+        <p class="text-xs text-gray-300 -mt-1">Battling Corruption</p>
+      </div>
+    </a>
+
+    <!-- Hamburger / X -->
+    <button
+      id="menu-btn"
+      class="md:hidden w-7 h-7 relative flex flex-col justify-center items-center focus:outline-none"
+    >
+      <span
+        class="bar absolute w-6 h-[2px] bg-white rounded transition-all duration-300 origin-center"
+      ></span>
+      <span
+        class="bar absolute w-6 h-[2px] bg-white rounded transition-all duration-300 origin-center mt-2"
+      ></span>
+    </button>
+
+    <!-- Desktop Nav -->
+    <nav class="hidden md:flex gap-6 text-slate-200">
+      <a href="index.html" >Home</a>
+      <a href="about.html">About</a>
+      <a href="data.html">Data</a>
+      <a href="charts.html">Charts</a>
+      <a href="reports.html">Reports</a>
+      <a href="team.html">Team</a>
+      <a href="contact.html">Contact</a>
+      <a href="community.html" class="active-link">Community</a>
+    </nav>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div
+    id="mobile-menu"
+    class="hidden flex-col justify-center items-center text-center bg-slate-900/90 backdrop-blur-2xl text-white py-10 space-y-6 border border-slate-700 transform scale-y-0 origin-top opacity-0 translate-y-5 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] rounded-2xl shadow-2xl w-[90%] mx-auto mt-3 mb-3"
+  >
+    <a href="index.html" class="block text-lg hover:text-yellow-400">Home</a>
+    <a href="about.html" class="block text-lg hover:text-yellow-400">About</a>
+    <a href="data.html" class="block text-lg hover:text-yellow-400">Data</a>
+    <a href="charts.html" class="block text-lg hover:text-yellow-400">Charts</a>
+    <a href="reports.html" class="block text-lg hover:text-yellow-400">Reports</a>
+    <a href="team.html" class="block text-lg hover:text-yellow-400">Team</a>
+    <a href="contact.html" class="block text-lg hover:text-yellow-400">Contact</a>
+    <a href="community.html" class="block text-lg hover:text-yellow-400 pb-3">Community</a>
+  </div>
+</header>
+
+  <main class="flex-grow">
+    <!-- Hero Section -->
+    <section class="min-h-[40vh] bg-gradient-to-b from-slate-900 to-slate-800 flex items-center">
+      <div class="max-w-6xl mx-auto px-6" data-aos="fade-up">
+        <h2 class="text-4xl font-bold text-blue-400">Community</h2>
+        <p class="mt-3 text-slate-300 max-w-2xl">
+          Speak up anonymously. Share issues or concerns about corruption in your community.
+        </p>
+      </div>
+    </section>
+
+    <!-- Whistleblower Form -->
+    <section class="py-20">
+      <div class="max-w-4xl mx-auto px-6 bg-slate-800 border border-slate-700 rounded-2xl p-8 shadow-lg" data-aos="fade-up">
+        <h3 class="text-2xl font-semibold mb-4 text-center text-blue-400">Submit an Anonymous Report</h3>
+        <p class="text-center text-slate-400 mb-8">No personal data is collected — your message is stored locally in your browser only.</p>
+
+        <form id="reportForm" class="space-y-5">
+          <div>
+            <label class="block text-sm mb-1 text-slate-300">Title</label>
+            <input type="text" placeholder="Enter a short title..." class="w-full px-4 py-2 rounded-lg border border-slate-600 bg-slate-900 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+          </div>
+
+          <div>
+            <label class="block text-sm mb-1 text-slate-300">Details</label>
+            <textarea rows="5" placeholder="Describe the issue..." class="w-full px-4 py-2 rounded-lg border border-slate-600 bg-slate-900 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" required></textarea>
+          </div>
+
+          <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white font-semibold rounded-lg transition">
+            Submit Report
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Posts Section -->
+    <section class="py-16 bg-slate-800 border-t border-slate-700">
+      <div class="max-w-6xl mx-auto px-6">
+        <h3 class="text-2xl font-semibold mb-8 text-center text-blue-400" data-aos="fade-up">Recent Anonymous Posts</h3>
+        <div id="community-posts" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8" data-aos="fade-up"></div>
+        <p id="no-posts" class="text-center text-slate-500 mt-10">No posts yet. Be the first to speak up!</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bg-slate-800 border-t border-slate-700 py-5 text-center text-sm text-slate-400">
+    © 2025 Syndicate — Built by Seiya Von | Hackathon 2025
+  </footer>
+
+  <!-- Toast Notifications -->
+  <div id="toastContainer" class="fixed top-5 right-5 space-y-3 z-50"></div>
+
+  <!-- Replace your posts rendering section script with this improved one -->
+<script>
+  
+
+  const form = document.querySelector("#reportForm");
+  const postsContainer = document.querySelector("#community-posts");
+  const noPostMsg = document.querySelector("#no-posts");
+  const toastContainer = document.querySelector("#toastContainer");
+
+  let posts = JSON.parse(localStorage.getItem("communityPosts")) || [];
+  let anonymousCount = parseInt(localStorage.getItem("anonymousCount")) || 0;
+
+  function truncateText(text, limit = 120) {
+    return text.length > limit ? text.substring(0, limit) + "..." : text;
+  }
+
+function renderPosts() {
+  postsContainer.innerHTML = "";
+  if (posts.length === 0) {
+    noPostMsg.style.display = "block";
+    return;
+  }
+  noPostMsg.style.display = "none";
+  posts.forEach((post, index) => {
+    const div = document.createElement("a");
+    div.href = `post.html?id=${index}`;
+    div.className =
+      "block p-8 rounded-2xl bg-slate-900 border border-slate-700 hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/10 transition transform hover:-translate-y-1";
+    div.innerHTML = `
+      <p class="text-base text-slate-400 mb-2 font-semibold">👤 ${post.anonymousName}</p>
+      <h4 class="text-xl font-bold text-blue-400 mb-2">${post.title}</h4>
+      <p class="text-[15px] text-slate-300 leading-relaxed">${truncateText(post.details, 180)}</p>
+      <p class="text-sm text-slate-500 mt-4">📅 ${post.date}</p>
+    `;
+    postsContainer.prepend(div);
+  });
+}
+
+
+  function showToast(message, type = "success") {
+    const toast = document.createElement("div");
+    const bgColor = type === "error" ? "bg-red-600" : "bg-blue-600";
+    toast.className = `toast px-5 py-3 text-white rounded-lg shadow-lg ${bgColor}`;
+    toast.textContent = message;
+    toastContainer.appendChild(toast);
+    setTimeout(() => toast.classList.add("show"), 50);
+    setTimeout(() => {
+      toast.classList.remove("show");
+      setTimeout(() => toast.remove(), 400);
+    }, 2500);
+  }
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const title = form.querySelector('input[type="text"]').value.trim();
+    const details = form.querySelector("textarea").value.trim();
+
+    if (!title || !details) {
+      showToast("⚠️ Please fill in both fields.", "error");
+      return;
+    }
+
+    anonymousCount++;
+    const anonymousName = `Anonymous ${anonymousCount}`;
+
+    const newPost = {
+      title,
+      details,
+      date: new Date().toLocaleString(),
+      anonymousName
+    };
+
+    posts.push(newPost);
+    localStorage.setItem("communityPosts", JSON.stringify(posts));
+    localStorage.setItem("anonymousCount", anonymousCount);
+    form.reset();
+    renderPosts();
+    showToast("✅ Message submitted successfully!");
+  });
+
+  renderPosts();
+
+
+  
+
+</script>
+<script>
+  // navbar + mobile menu logic (same as before)
+  const menuBtn = document.getElementById('menu-btn');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const bars = menuBtn.querySelectorAll('.bar');
+  const navbar = document.getElementById('navbar');
+
+  menuBtn.addEventListener('click', () => {
+    const isOpen = mobileMenu.classList.contains('scale-y-100');
+    if (!isOpen) {
+      mobileMenu.classList.remove('hidden');
+      setTimeout(() => {
+        mobileMenu.classList.add('flex', 'scale-y-100', 'opacity-100', 'translate-y-0');
+        mobileMenu.classList.remove('scale-y-0', 'opacity-0', 'translate-y-5');
+      }, 10);
+      bars[0].classList.add('rotate-45', 'translate-y-[4px]');
+      bars[1].classList.add('-rotate-45', '-translate-y-[4px]');
+    } else {
+      mobileMenu.classList.remove('scale-y-100', 'opacity-100', 'translate-y-0');
+      mobileMenu.classList.add('scale-y-0', 'opacity-0', 'translate-y-5');
+      setTimeout(() => {
+        mobileMenu.classList.remove('flex');
+        mobileMenu.classList.add('hidden');
+      }, 400);
+      bars[0].classList.remove('rotate-45', 'translate-y-[4px]');
+      bars[1].classList.remove('-rotate-45', '-translate-y-[4px]');
+    }
+  });
+
+  document.querySelectorAll('#mobile-menu a').forEach(link => {
+    link.addEventListener('click', () => {
+      mobileMenu.classList.remove('scale-y-100', 'opacity-100', 'translate-y-0');
+      mobileMenu.classList.add('scale-y-0', 'opacity-0', 'translate-y-5');
+      setTimeout(() => {
+        mobileMenu.classList.remove('flex');
+        mobileMenu.classList.add('hidden');
+      }, 400);
+      bars[0].classList.remove('rotate-45', 'translate-y-[4px]');
+      bars[1].classList.remove('-rotate-45', '-translate-y-[4px]');
+    });
+  });
+
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 10) {
+      navbar.classList.add('top-3', 'w-[95%]', 'rounded-3xl', 'shadow-lg', 'bg-white/30', 'dark:bg-slate-900/50', 'border');
+    } else {
+      navbar.classList.remove('top-3', 'w-[95%]', 'rounded-3xl', 'shadow-lg', 'bg-white/30', 'dark:bg-slate-900/50', 'border');
+      navbar.classList.add('w-full', 'border-b');
+    }
+  });
+</script>

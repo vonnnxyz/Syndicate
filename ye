@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Charts — Syndicate</title>
+
+  <!-- Libraries -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+  <style>
+    * { transition: all 0.28s ease-in-out; }
+    html { scroll-behavior: smooth; }
+    body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+    @keyframes gloss {
+      0%,100% { opacity: 0; transform: translateX(-100%); }
+      50% { opacity: 1; transform: translateX(100%); }
+    }
+
+    nav a { position: relative; transition: color .28s ease; }
+    nav a::after {
+      content:"";
+      position:absolute;
+      bottom:-4px; left:50%;
+      transform:translateX(-50%) scaleX(0);
+      width:60%; height:2px;
+      background: linear-gradient(to right,#60a5fa,#3b82f6);
+      border-radius:9999px; opacity:.85;
+      transition: transform .28s ease-in-out;
+    }
+    nav a:hover::after { transform:translateX(-50%) scaleX(1); }
+    .active-link { color:#60a5fa; font-weight:600; }
+    .active-link::after { transform:translateX(-50%) scaleX(1); opacity:.95; }
+
+    .glass { background: rgba(255,255,255,0.08); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+    .card-glow { box-shadow: 0 8px 25px rgba(59,130,246,0.08); border-radius:14px; }
+
+    /* Dropdown style from Data.html */
+    .dropdown-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      backdrop-filter: blur(12px);
+      border-radius: 1rem;
+      padding: 0.75rem 1rem;
+      width: 100%;
+      box-shadow: 0 8px 24px rgba(59,130,246,0.08);
+      transition: all 0.3s ease;
+    }
+    .dropdown-wrapper:hover {
+      box-shadow: 0 8px 30px rgba(59,130,246,0.15);
+      border-color: rgba(59,130,246,0.3);
+    }
+    .dropdown-wrapper::after {
+      content: '▾';
+      position: absolute;
+      right: 1.2rem;
+      color: #9ca3af;
+      pointer-events: none;
+      font-size: 1rem;
+      transition: transform 0.3s ease;
+    }
+    select:focus + .dropdown-wrapper::after {
+      transform: rotate(180deg);
+    }
+    select {
+      background: transparent;
+      flex: 1;
+      border: none;
+      color: white;
+      font-size: 0.95rem;
+      appearance: none;
+      padding-right: 2rem;
+    }
+    select:focus {
+      outline: none;
+    }
+
+    .trend-up { color: #16a34a; }
+    .trend-down { color: #dc2626; }
+    .trend-flat { color: #64748b; }
+
+    #lineChart { max-height: 280px !important; }
+  </style>
+</head>
+
+<body class="min-h-screen flex flex-col bg-white text-slate-900 dark:bg-slate-900 dark:text-white">
+<main class="flex-grow"></main>
+
+<!-- NAVBAR -->
+<header id="navbar" class="fixed top-0 left-1/2 -translate-x-1/2 z-50 w-full md:w-[95%] bg-white/20 dark:bg-slate-900/40 backdrop-blur-2xl border-b border-white/10 dark:border-slate-700 transition-all duration-500 overflow-hidden">
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent opacity-0 animate-[gloss_6s_linear_infinite]"></div>
+  </div>
+
+  <div class="flex items-center justify-between h-16 px-6 relative">
+    <a href="index.html" class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-md bg-gradient-to-br from-blue-700 to-yellow-400 flex items-center justify-center text-white font-bold text-lg">S</div>
+      <div class="flex flex-col leading-tight">
+        <h1 class="text-lg font-bold text-white">Syndicate</h1>
+        <p class="text-xs text-gray-300 -mt-1">Battling Corruption</p>
+      </div>
+    </a>
+
+    <!-- Hamburger -->
+    <button id="menu-btn" class="md:hidden w-7 h-7 relative flex flex-col justify-center items-center focus:outline-none">
+      <span class="bar absolute w-6 h-[2px] bg-white rounded transition-all duration-300 origin-center"></span>
+      <span class="bar absolute w-6 h-[2px] bg-white rounded transition-all duration-300 origin-center mt-2"></span>
+    </button>
+
+    <!-- Desktop Nav -->
+    <nav class="hidden md:flex gap-6 text-slate-200">
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="data.html">Data</a>
+      <a href="charts.html" class="active-link">Charts</a>
+      <a href="reports.html">Reports</a>
+      <a href="team.html">Team</a>
+      <a href="contact.html">Contact</a>
+      <a href="community.html">Community</a>
+    </nav>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div id="mobile-menu" class="hidden flex-col justify-center items-center text-center bg-slate-900/90 backdrop-blur-2xl text-white py-10 space-y-6 border border-slate-700 transform scale-y-0 origin-top opacity-0 translate-y-5 transition-all duration-500 rounded-2xl shadow-2xl w-[90%] mx-auto mt-3 mb-3">
+    <a href="index.html" class="block text-lg hover:text-yellow-400">Home</a>
+    <a href="about.html" class="block text-lg hover:text-yellow-400">About</a>
+    <a href="data.html" class="block text-lg hover:text-yellow-400">Data</a>
+    <a href="charts.html" class="block text-lg text-yellow-400 font-semibold">Charts</a>
+    <a href="reports.html" class="block text-lg hover:text-yellow-400">Reports</a>
+    <a href="team.html" class="block text-lg hover:text-yellow-400">Team</a>
+    <a href="contact.html" class="block text-lg hover:text-yellow-400">Contact</a>
+    <a href="community.html" class="block text-lg hover:text-yellow-400 pb-3">Community</a>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="min-h-[50vh] bg-gradient-to-b from-slate-900 to-slate-800 text-white flex items-center pt-24">
+  <div class="max-w-5xl mx-auto px-6 text-center" data-aos="fade-up">
+    <h1 class="text-4xl md:text-5xl font-extrabold">Transparency Dashboard — Charts</h1>
+    <p class="mt-3 text-slate-300 text-lg max-w-2xl mx-auto">Analyze and visualize governance indicators interactively.</p>
+  </div>
+</section>
+
+<!-- MAIN DASHBOARD -->
+<main class="max-w-6xl mx-auto px-6 py-12 space-y-8">
+  <!-- Selector -->
+  <div class="flex justify-center" data-aos="fade-up">
+    <div class="dropdown-wrapper sm:w-2/3 md:w-1/2">
+      <label for="indicatorSelect" class="text-xs text-slate-300 hidden sm:block">Indicator</label>
+      <select id="indicatorSelect">
+        <option>Loading indicators...</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Chart + Snapshot -->
+  <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-1 glass rounded-2xl p-5 card-glow" data-aos="fade-up">
+      <div class="flex items-start justify-between">
+        <div>
+          <div class="text-xs text-slate-500 uppercase">Snapshot</div>
+          <div id="snap-value" class="text-2xl font-semibold mt-2">—</div>
+          <div id="snap-sub" class="text-xs text-slate-500 mt-1">Latest value</div>
+        </div>
+        <div class="text-right">
+          <div id="snap-pct" class="text-lg font-semibold text-slate-300">—</div>
+          <div id="snap-trend" class="text-xs text-slate-500 mt-1">Trend</div>
+        </div>
+      </div>
+      <button id="viewDetailsBtn" class="mt-4 w-full py-2 rounded-md bg-yellow-400 hover:bg-yellow-300 text-slate-900 text-sm font-semibold shadow">View Indicator Details</button>
+      <p class="mt-3 text-xs text-slate-500">Source: <span class="text-slate-200">World Bank • COA • PhilGEPS</span></p>
+    </div>
+
+    <div class="lg:col-span-2 glass rounded-2xl p-5 card-glow" data-aos="fade-up">
+      <div class="flex items-center justify-between mb-3">
+        <h2 id="chartTitle" class="text-lg font-semibold text-white">Indicator Overview</h2>
+        <div id="chart-year-range" class="text-xs text-slate-400">—</div>
+      </div>
+      <div class="relative w-full h-[280px] sm:h-[300px]">
+        <canvas id="lineChart" class="w-full h-full"></canvas>
+      </div>
+      <p class="mt-3 text-xs text-slate-500">Yearly trend of the selected indicator.</p>
+    </div>
+  </section>
+
+  <!-- Metadata -->
+  <section id="metaBox" class="glass rounded-2xl p-5 border border-white/10 hidden" data-aos="fade-up">
+    <h3 id="metaTitle" class="text-lg font-semibold text-white">Indicator Title</h3>
+    <p id="metaDesc" class="text-sm text-slate-300 mt-2">Definition will appear here.</p>
+    <div id="metaInfo" class="text-xs text-slate-400 mt-3"></div>
+  </section>
+
+  <!-- Insights -->
+  <section id="insightBox" class="glass rounded-2xl p-5 border border-white/10 hidden" data-aos="fade-up">
+    <h4 class="font-semibold text-white">Insights</h4>
+    <p id="trendSummary" class="mt-2 text-slate-300"></p>
+  </section>
+
+  <!-- Table -->
+  <section class="glass rounded-2xl p-5 border border-white/10" data-aos="fade-up">
+    <h4 class="font-medium mb-4 text-white">Yearly values</h4>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm text-left text-slate-200">
+        <thead class="text-xs uppercase bg-slate-800">
+          <tr><th class="p-2">Year</th><th class="p-2">Value</th></tr>
+        </thead>
+        <tbody id="valuesTable" class="divide-y divide-slate-700"></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<footer class="bg-slate-100 dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 py-5 text-center text-sm text-slate-500 dark:text-slate-400">
+  © 2025 Syndicate — Data from World Bank • COA • PhilGEPS
+</footer>
+
+<!-- JS (same logic as before) -->
+<script>
+AOS.init({ duration: 900, once: true });
+
+// navbar + mobile
+const navbar=document.getElementById('navbar');
+window.addEventListener('scroll',()=>{if(window.scrollY>10)navbar.classList.add('top-3','w-[95%]','rounded-3xl','shadow-lg');else navbar.classList.remove('top-3','w-[95%]','rounded-3xl','shadow-lg');});
+const menuBtn=document.getElementById('menu-btn'),mobileMenu=document.getElementById('mobile-menu'),bars=menuBtn.querySelectorAll('.bar');
+menuBtn.addEventListener('click',()=>{const o=mobileMenu.classList.contains('scale-y-100');if(!o){mobileMenu.classList.remove('hidden');setTimeout(()=>mobileMenu.classList.add('flex','scale-y-100','opacity-100'),10);bars[0].classList.add('rotate-45','translate-y-[4px]');bars[1].classList.add('-rotate-45','-translate-y-[4px]');}else{mobileMenu.classList.remove('scale-y-100','opacity-100');setTimeout(()=>{mobileMenu.classList.add('hidden');mobileMenu.classList.remove('flex');},400);bars[0].classList.remove('rotate-45','translate-y-[4px]');bars[1].classList.remove('-rotate-45','-translate-y-[4px]');}});
+
+const state={data:[],meta:[],chart:null,currentRow:null};
+const fmt=v=>isNaN(v)?"—":(+v>=1e9?(v/1e9).toFixed(2)+'B':+v>=1e6?(v/1e6).toFixed(2)+'M':+v>=1e3?(v/1e3).toFixed(1)+'K':(+v).toFixed(2));
+function parseNum(v){const s=String(v||"").replace(/[, ]/g,"");const n=parseFloat(s);return isNaN(n)?null:n;}
+function extract(r){return Object.keys(r).filter(k=>/^\d{4}$/.test(k)).map(y=>({y:+y,v:parseNum(r[y])})).filter(p=>p.v!=null);}
+function renderTable(pts){document.getElementById("valuesTable").innerHTML=pts.map(p=>`<tr><td class='p-2'>${p.y}</td><td class='p-2'>${fmt(p.v)}</td></tr>`).join("");}
+
+function draw(row){
+  const pts=extract(row);if(!pts.length)return;
+  state.currentRow=row;
+  const ctx=document.getElementById("lineChart").getContext("2d");
+  const grad=ctx.createLinearGradient(0,0,0,300);grad.addColorStop(0,"rgba(59,130,246,0.3)");grad.addColorStop(1,"rgba(59,130,246,0.05)");
+  const data=pts.map(p=>p.v), years=pts.map(p=>p.y);
+  if(state.chart){state.chart.data.labels=years;state.chart.data.datasets[0].data=data;state.chart.update();}
+  else{state.chart=new Chart(ctx,{type:"line",data:{labels:years,datasets:[{data,borderColor:"#3b82f6",backgroundColor:grad,fill:true,tension:0.3,pointRadius:2}]},options:{maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:"#64748b"}},y:{ticks:{color:"#64748b",callback:v=>fmt(v)}}}}});}
+  document.getElementById("chartTitle").textContent=row.SeriesName;
+  document.getElementById("chart-year-range").textContent=`${years[0]} — ${years.at(-1)}`;
+  renderTable(pts);
+  const change=((data.at(-1)-data[0])/Math.abs(data[0]))*100;
+  const pct=change.toFixed(1),snapPct=document.getElementById("snap-pct");
+  document.getElementById("snap-value").textContent=fmt(data.at(-1));
+  document.getElementById("snap-sub").textContent=`Latest (${years.at(-1)})`;
+  if(change>0){snapPct.textContent=`+${pct}%`;snapPct.className="text-green-600";document.getElementById("snap-trend").innerHTML="<span class='trend-up'>▲ Increasing</span>";}
+  else if(change<0){snapPct.textContent=`${pct}%`;snapPct.className="text-red-600";document.getElementById("snap-trend").innerHTML="<span class='trend-down'>▼ Decreasing</span>";}
+  else{snapPct.textContent="0%";snapPct.className="text-slate-600";document.getElementById("snap-trend").innerHTML="<span class='trend-flat'>→ Stable</span>";}
+  document.getElementById("trendSummary").innerHTML=`<strong>${row.SeriesName}</strong> has changed by <strong>${pct}%</strong> from ${years[0]} to ${years.at(-1)}.`;
+  document.getElementById("insightBox").classList.remove("hidden");
+}
+
+/* ✅ NEW: fill the metaBox with info from Series-Metadata.csv */
+function showMeta(){
+  const box=document.getElementById("metaBox");
+  const title=document.getElementById("metaTitle");
+  const desc=document.getElementById("metaDesc");
+  const info=document.getElementById("metaInfo");
+  const row=state.currentRow;
+  if(!row){box.classList.add("hidden");return;}
+  const code=row.SeriesCode||row["Series Code"];
+  const metaRow=state.meta.find(m=>m.Code===code || m["Code"]===code);
+  if(!metaRow){title.textContent=row.SeriesName;desc.textContent="No metadata available.";info.innerHTML="";box.classList.remove("hidden");return;}
+  title.textContent=metaRow.IndicatorName||row.SeriesName;
+  desc.textContent=metaRow.LongDefinition||metaRow.ShortDefinition||"No definition available.";
+  info.innerHTML=`
+    <p><strong>Code:</strong> ${metaRow.Code||code||"N/A"}</p>
+    <p><strong>Topic:</strong> ${metaRow.Topic||"N/A"}</p>
+    <p><strong>Unit of Measure:</strong> ${metaRow.UnitOfMeasure||"N/A"}</p>
+    <p><strong>Source:</strong> ${metaRow.Source||"World Bank"}</p>
+  `;
+  box.classList.remove("hidden");
+}
+
+function init(){
+  Papa.parse("Series-Metadata.csv",{download:true,header:true,complete:m=>{state.meta=m.data;
+    Papa.parse("Data.csv",{download:true,header:true,complete:d=>{
+      state.data=d.data.filter(r=>String(r.CountryName||r["Country Name"]||"").toLowerCase()=="philippines");
+      const sel=document.getElementById("indicatorSelect");
+      sel.innerHTML=state.data.map(r=>`<option>${r.SeriesName}</option>`).join("");
+      const def=state.data.find(r=>/corruption/i.test(r.SeriesName))||state.data[0];
+      sel.value=def.SeriesName;draw(def);
+      sel.addEventListener("change",()=>{const row=state.data.find(r=>r.SeriesName==sel.value);if(row)draw(row);});
+    }});}});}
+document.getElementById("viewDetailsBtn").addEventListener("click",showMeta);
+document.addEventListener("DOMContentLoaded",init);
+</script>
+</body>
+</html>
