@@ -68,7 +68,7 @@
       p { font-size: 0.85rem; }
       .glass { padding: 0.75rem; border-radius: 10px; }
       footer { font-size: 0.65rem; padding: 1rem; }
-      .submit-btn { font-size: 0.85rem; padding: 0.5rem 1rem; }
+      .submit-btn, .export-btn, .import-btn { font-size: 0.85rem; padding: 0.5rem 1rem; }
     }
   </style>
 </head>
@@ -127,7 +127,7 @@
       <div class="glass p-4 sm:p-6 md:p-8 card-glow" data-aos="fade-up">
         <h3 class="text-xl sm:text-2xl font-semibold mb-4 text-center text-blue-400">Submit an Anonymous Report</h3>
         <p class="text-center text-slate-400 mb-6 sm:mb-8 text-sm sm:text-base">
-          No personal data is collected — your message is stored locally in your browser only.
+          No personal data is collected — your message is stored locally in your browser. Export to share with others.
         </p>
         <form id="reportForm" class="space-y-5">
           <div>
@@ -140,6 +140,13 @@
           </div>
           <button type="submit" class="submit-btn w-full py-2 sm:py-3 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white font-semibold rounded-lg transition">Submit Report</button>
         </form>
+        <div class="mt-6 flex flex-col sm:flex-row gap-4">
+          <button id="exportBtn" class="export-btn w-full sm:w-1/2 py-2 sm:py-3 bg-green-600 hover:bg-green-500 text-white font-semibold rounded-lg transition">Export Posts</button>
+          <label class="import-btn w-full sm:w-1/2 py-2 sm:py-3 bg-purple-600 hover:bg-purple-500 text-white font-semibold rounded-lg text-center cursor-pointer">
+            Import Posts
+            <input type="file" id="importInput" accept=".json" class="hidden">
+          </label>
+        </div>
       </div>
     </div>
   </section>
@@ -210,10 +217,19 @@
     const postsContainer = document.querySelector("#community-posts");
     const noPostMsg = document.querySelector("#no-posts");
     const toastContainer = document.querySelector("#toastContainer");
+    const exportBtn = document.getElementById("exportBtn");
+    const importInput = document.getElementById("importInput");
     let posts = JSON.parse(localStorage.getItem("communityPosts")) || [];
     let anonymousCount = parseInt(localStorage.getItem("anonymousCount")) || 0;
     function truncateText(text, limit = 180) {
       return text.length > limit ? text.substring(0, limit) + "..." : text;
+    }
+    function validatePost(post) {
+      return post && typeof post === 'object' && 
+             typeof post.title === 'string' && post.title.trim() &&
+             typeof post.details === 'string' && post.details.trim() &&
+             typeof post.date === 'string' && post.date.trim() &&
+             typeof post.anonymousName === 'string' && post.anonymousName.trim();
     }
     function renderPosts() {
       postsContainer.innerHTML = "";
@@ -232,7 +248,7 @@
           <p class="text-sm sm:text-base text-slate-400 mb-2 font-semibold">👤 ${post.anonymousName}</p>
           <h4 class="text-lg sm:text-xl font-bold text-blue-400 mb-2">${post.title}</h4>
           <p class="text-sm sm:text-[15px] text-slate-300 leading-relaxed">${truncateText(post.details)}</p>
-          <p class="text-xs sm:text-sm text-slate-500 mt-4">${post.date}</p>
+          <p class="text-xs sm:text-sm text-slate-500 mt-4">📅 ${post.date}</p>
         `;
         postsContainer.prepend(div);
       });
@@ -240,7 +256,7 @@
     }
     function showToast(message, type = "success") {
       const toast = document.createElement("div");
-      const bgColor = type === "error" ? "bg-red-600" : "bg-blue-600";
+      const bgColor = type === "error" ? "bg-red-600" : type === "success" ? "bg-blue-600" : "bg-green-600";
       toast.className = `toast px-4 sm:px-5 py-2 sm:py-3 text-white rounded-lg shadow-lg ${bgColor} text-sm sm:text-base`;
       toast.textContent = message;
       toastContainer.appendChild(toast);
@@ -271,7 +287,61 @@
       localStorage.setItem("anonymousCount", anonymousCount);
       form.reset();
       renderPosts();
-      showToast("Message submitted successfully!");
+      showToast("✅ Message submitted successfully!");
+    });
+    exportBtn.addEventListener("click", () => {
+      if (posts.length === 0) {
+        showToast("⚠️ No posts to export.", "error");
+        return;
+      }
+      const dataStr = JSON.stringify(posts, null, 2);
+      const blob = new Blob([dataStr], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "community-posts.json";
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast("📤 Posts exported successfully!", "success");
+    });
+    importInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) {
+        showToast("⚠️ No file selected.", "error");
+        return;
+      }
+      if (!file.name.endsWith(".json")) {
+        showToast("⚠️ Please select a .json file.", "error");
+        e.target.value = "";
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const importedPosts = JSON.parse(event.target.result);
+          if (!Array.isArray(importedPosts)) {
+            showToast("⚠️ Invalid file format.", "error");
+            return;
+          }
+          const validPosts = importedPosts.filter(validatePost);
+          if (validPosts.length === 0) {
+            showToast("⚠️ No valid posts found in file.", "error");
+            return;
+          }
+          posts = [...posts, ...validPosts];
+          localStorage.setItem("communityPosts", JSON.stringify(posts));
+          renderPosts();
+          showToast(`📥 Imported ${validPosts.length} post${validPosts.length > 1 ? 's' : ''} successfully!`, "success");
+        } catch (error) {
+          showToast("⚠️ Error reading file.", "error");
+        }
+        e.target.value = "";
+      };
+      reader.onerror = () => {
+        showToast("⚠️ Error reading file.", "error");
+        e.target.value = "";
+      };
+      reader.readAsText(file);
     });
     renderPosts();
   </script>
